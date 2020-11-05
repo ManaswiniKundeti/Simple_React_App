@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { setUserSession } from '../utils/Common';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,6 +15,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import SignUp from './SignUp'
+
 
 function Copyright() {
     return ( <
@@ -57,8 +60,28 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SignInSide() {
+export default function SignInSide(props) {
     const classes = useStyles();
+
+    const [loading, setLoading] = useState(false);
+    const username = useFormInput('');
+    const password = useFormInput('');
+    const [error, setError] = useState(null);
+
+    // handle button click of login form
+    const handleLogin = () => {
+        setError(null);
+        setLoading(true);
+        axios.post('http://localhost:4000/users/signin', { username: username.value, password: password.value }).then(response => {
+        setLoading(false);
+        setUserSession(response.data.token, response.data.user);
+        props.history.push('/dashboard');
+    }).catch(error => {
+        setLoading(false);
+        if (error.response.status === 401) setError(error.response.data.message);
+        else setError("Something went wrong. Please try again later.");
+    });
+    }
 
     return ( <
         Grid container component = "main"
@@ -95,32 +118,40 @@ export default function SignInSide() {
         <
         TextField variant = "outlined"
         margin = "normal"
-        required fullWidth id = "email"
-        label = "Email Address"
-        name = "email"
-        autoComplete = "email"
-        autoFocus /
-        >
+        required fullWidth id = "username"
+        label = "Username"
+        name = "username" {...username }
+        autoComplete = "username"
+        autoFocus/>
         <
         TextField variant = "outlined"
         margin = "normal"
         required fullWidth name = "password"
         label = "Password"
         type = "password"
-        id = "password"
-        autoComplete = "current-password" /
-        >
+        id = "password" {...password }
+        autoComplete = "current-password" />
         <
         FormControlLabel control = { < Checkbox value = "remember"
-            color = "primary" / >
+            color = "primary" />
         }
-        label = "Remember me" /
-        >
+        label = "Remember me" />
+        {
+            error && <>
+            <small style = {
+                { color: 'red' }
+            } > { error } </small> <
+            br/>
+            </>
+        } <br/>
         <
         Button type = "submit"
         fullWidth variant = "contained"
         color = "primary"
-        className = { classes.submit } >
+        className = { classes.submit }
+        value = { loading ? 'Loading...' : 'Login' }
+        onClick = { handleLogin }
+        disabled = { loading } >
         Sign In <
         /Button> <
         Grid container >
@@ -142,12 +173,22 @@ export default function SignInSide() {
         /Grid> <
         Box mt = { 5 } >
         <
-        Copyright / >
-        <
-        /Box> < /
+        Copyright/>
+        </Box> < /
         form > <
         /div> < /
         Grid > <
         /Grid>
     );
 }
+const useFormInput = initialValue => {
+    const [value, setValue] = useState(initialValue);
+
+    const handleChange = e => {
+        setValue(e.target.value);
+    };
+    return {
+        value,
+        onChange: handleChange
+    };
+};
