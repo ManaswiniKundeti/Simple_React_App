@@ -14,24 +14,6 @@ function App() {
         <
         div >
         <
-        nav >
-        <
-        ul >
-        <
-        li >
-        <
-        Link to = "/" > SignInSide < /Link> < /
-        li > <
-        li >
-        <
-        Link to = "/signUp" > SignUp < /Link> < /
-        li > <
-        li >
-        <
-        Link to = "/signIn" > SignInSide < /Link> < /
-        li > <
-        /ul> < /
-        nav > <
         Switch >
         <
         Route path = "/signIn" >
@@ -39,8 +21,7 @@ function App() {
         SignInSide / >
         <
         /Route> <
-        Route path = "/signUp"
-        component = { SignUp } >
+        Route path = "/signUp" >
         <
         SignUp / >
         <

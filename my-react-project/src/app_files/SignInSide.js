@@ -135,7 +135,7 @@ export default function SignInSide() {
         Grid > <
         Grid item >
         <
-        Link to = "/signUp"
+        Link href = "/signUp"
         variant = "body2" > { "Don't have an account? Sign Up" } <
         /Link> < /
         Grid > <
